@@ -24,7 +24,7 @@ uint32_t millisec;
 uint8_t server_addr[4] = {192, 168, 0, 10};
 uint8_t retval_server;
 uint8_t sock_status_server;
-// uint8_t msg;
+uint8_t msg_server;
 
 /* Function declaration */
 void thread_toggle(void const *argument);
@@ -95,16 +95,16 @@ void callback(void const *param)
 /* Run setup needed for all periodic tasks */
 int Application_Setup()
 {
-  // Reset global variables
-  reference = 2000;
-  velocity = 0;
-  control = 0;
-  millisec = 0;
+	// Reset global variables
+	reference = 2000;
+	velocity = 0;
+	control = 0;
+	millisec = 0;
 
-  // Initialise hardware
-  Peripheral_GPIO_EnableMotor();
-
-  // Initialise(create) timer
+	// Initialise hardware
+	Peripheral_GPIO_EnableMotor();
+	
+	// Initialise(create) timer
   timer_toggle = osTimerCreate(osTimer(timer_toggle_handle), osTimerPeriodic, (void *)0);
 
   osKernelInitialize();
@@ -116,52 +116,55 @@ int Application_Setup()
 
   osKernelStart();
 
-  return 0;
+	return 0;
 }
 
 /* Define what to do in the infinite loop */
 void Application_Loop()
 {
-  printf("Opening socket... ");
-  // Open socket
-  if ((retval_server = socket(APP_SOCK, SOCK_STREAM, SERVER_PORT, SF_TCP_NODELAY)) == APP_SOCK)
-  {
-    printf("Success!\r\n");
-    osTimerStart(timer_toggle, PERIOD_REF);
-    // Put socket in listen mode
-    printf("Listening... ");
-    if ((retval_server = listen(APP_SOCK)) == SOCK_OK)
-    {
-      printf("Success!\r\n");
-      retval_server = getsockopt(APP_SOCK, SO_STATUS, &sock_status_server);
-      while (sock_status_server == SOCK_LISTEN || sock_status_server == SOCK_ESTABLISHED)
-      {
-        // If the client has connected, print the message
-        if (sock_status_server == SOCK_ESTABLISHED)
-        {
-          osSignalSet(process_ID, 0x02);
+	printf("Opening socket... ");
+	// Open socket
+	if ((retval_server = socket(APP_SOCK, SOCK_STREAM, SERVER_PORT, SF_TCP_NODELAY)) == APP_SOCK)
+	{
+		 printf("Success!\r\n");
+		// Put socket in listen mode
+		 printf("Listening... ");
+		if ((retval_server = listen(APP_SOCK)) == SOCK_OK)
+		{
+			 printf("Success!\r\n");
+			retval_server = getsockopt(APP_SOCK, SO_STATUS, &sock_status_server);
+			while (sock_status_server == SOCK_LISTEN || sock_status_server == SOCK_ESTABLISHED)
+			{
+				// If the client has connected, print the message
+				if (sock_status_server == SOCK_ESTABLISHED)
+				{
+//					retval_server = recv(APP_SOCK, (uint8_t *)&msg_server, sizeof(msg_server));
+//					 printf("Received: %d\r\n", msg_server);
+					osSignalSet(process_ID, 0x02);
           // Do nothing
           osSignalWait(0x01, osWaitForever);
-        }
-        // Otherwise, wait for 100 msec and check again
-        else
-          osDelay(100);
-        retval_server = getsockopt(APP_SOCK, SO_STATUS, &sock_status_server);
-      }
-      printf("Disconnected! ");
-    }
-    else // Something went wrong
-    {
-      printf("Failed! \r\n");
-    }
-    // Close the socket and start a connection again
-    close(APP_SOCK);
-    printf("Socket closed.\r\n");
-  }
-  else // Can't open the socket. This may mean something is wrong with W5500 configuration
-  {
-    printf("Failed to open socket!\r\n");
-  }
-  // Wait 500 msec before opening
-  HAL_Delay(500);
+				}
+				// Otherwise, wait for 100 msec and check again
+				else
+				{
+					printf("sock_status: %d\r\n",sock_status_server);
+					osDelay(100);}
+				retval_server = getsockopt(APP_SOCK, SO_STATUS, &sock_status_server);
+			}
+			 printf("Disconnected! ");
+		}
+		else // Something went wrong
+		{
+			 printf("Failed! \r\n");
+		}
+		// Close the socket and start a connection again
+		close(APP_SOCK);
+		 printf("Socket closed.\r\n");
+	}
+	else // Can't open the socket. This may mean something is wrong with W5500 configuration
+	{
+		 printf("Failed to open socket!\r\n");
+	}
+	// Wait 500 msec before opening
+	osDelay(500);
 }

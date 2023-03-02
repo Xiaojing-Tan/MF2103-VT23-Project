@@ -24,7 +24,7 @@ uint32_t millisec;
 uint8_t server_addr[4] = {192, 168, 0, 10};
 uint8_t retval_client;
 uint8_t sock_status_client;
-// uint8_t msg_client;
+uint8_t msg_client;
 
 /* Function declaration */
 void thread_getspeed(void const *argument);
@@ -56,20 +56,21 @@ void thread_getspeed(void const *argument)
     // Get current velocity
     encoder = Peripheral_Timer_ReadEncoder();
     velocity = Controller_CalculateVelocity(encoder, millisec);
+		printf("Get velocity: %d\r\n",velocity);
 
     // Check connection
     retval_client = getsockopt(APP_SOCK, SO_STATUS, &sock_status_client);
     if (sock_status_client == SOCK_ESTABLISHED)
     {
       // Start communicating thread
-      osSignalSet(communicate_ID, 0x02);
+      osSignalSet(communicate_ID, 0x03);
     }
     else
     {
       // Stop the motor
       Peripheral_PWM_ActuateMotor(0);
       printf("Disconnected! Motor stopped! ");
-      osSignalSet(main_ID, 0x01);
+//		osSignalSet(main_ID, 0x01);
     }
   }
 }
@@ -78,10 +79,10 @@ void thread_PWM(void const *argument)
 {
   for (;;)
   {
-    osSignalWait(0x02, osWaitForever);
+    osSignalWait(0x04, osWaitForever);
     // Apply control signal to motor
     Peripheral_PWM_ActuateMotor(control);
-		osSignalSet(main_ID, 0x01);
+//		osSignalSet(main_ID, 0x01);
   }
 }
 
@@ -89,7 +90,7 @@ void thread_communicate(void const *argument)
 {
   for (;;)
   {
-    osSignalWait(0x02, osWaitForever);
+    osSignalWait(0x03, osWaitForever);
     // Send the velocity
     retval_client = send(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity));
     printf("Sent velocity: %d\r\n", velocity);
@@ -97,7 +98,7 @@ void thread_communicate(void const *argument)
     // Actuate PWM unitl receive control signal
     retval_client = recv(APP_SOCK, (uint8_t *)&control, sizeof(control));
     printf("Received control: %d\r\n", control);
-    osSignalSet(PWM_ID, 0x02);
+    osSignalSet(PWM_ID, 0x04);
   }
 }
 
@@ -114,15 +115,15 @@ void callback(void const *param)
 /* Run setup needed for all periodic tasks */
 int Application_Setup()
 {
-  // Reset global variables
-  velocity = 0;
-  control = 0;
-  millisec = 0;
+	// Reset global variables
+	velocity = 0;
+	control = 0;
+	millisec = 0;
 
-  // Initialise hardware
-  Peripheral_GPIO_EnableMotor();
-
-  // Initialise(create) timer
+	// Initialise hardware
+	Peripheral_GPIO_EnableMotor();
+	
+	// Initialise(create) timer
   timer_ctrl = osTimerCreate(osTimer(timer_ctrl_handle), osTimerPeriodic, (void *)0);
 
   osKernelInitialize();
@@ -130,49 +131,60 @@ int Application_Setup()
   // Initialise(create) threads
   PWM_ID = osThreadCreate(osThread(thread_PWM), NULL);
   getspeed_ID = osThreadCreate(osThread(thread_getspeed), NULL);
+  communicate_ID = osThreadCreate(osThread(thread_communicate), NULL);
   main_ID = osThreadGetId();
 
   osKernelStart();
 
-  return 0;
+	return 0;
 }
 
 /* Define what to do in the infinite loop */
 void Application_Loop()
 {
-  printf("Opening socket... ");
-  // Open socket
-  if ((retval_client = socket(APP_SOCK, SOCK_STREAM, CLIENT_PORT, SF_TCP_NODELAY)) == APP_SOCK)
-  {
-    printf("Success!\r\n");
-    // Try to connect to server
-    printf("Connecting to server... ");
-    if ((retval_client = connect(APP_SOCK, server_addr, SERVER_PORT)) == SOCK_OK)
-    {
-      printf("Success!\r\n");
+	printf("Opening socket... ");
+	// Open socket
+	if ((retval_client = socket(APP_SOCK, SOCK_STREAM, SERVER_PORT, SF_TCP_NODELAY)) == APP_SOCK)
+	{
+		printf("Success!\r\n");
+		// Try to connect to server
+		 printf("Connecting to server... ");
+		if ((retval_client = connect(APP_SOCK, server_addr, SERVER_PORT)) == SOCK_OK)
+		{
+			 printf("Success!\r\n");
       // Start timer here
       osTimerStart(timer_ctrl, PERIOD_CTRL);
-      retval_client = getsockopt(APP_SOCK, SO_STATUS, &sock_status_client);
-      while (sock_status_client == SOCK_ESTABLISHED)
+//			for (msg_client = 0; msg_client < 100; msg_client++)
+//			{
+//				retval_client = getsockopt(APP_SOCK, SO_STATUS, &sock_status_client);
+//				if (sock_status_client == SOCK_ESTABLISHED)
+//				{
+//					retval_client = send(APP_SOCK, (uint8_t *)&msg_client, sizeof(msg_client));
+//					 printf("Sent: %d\r\n", msg_client);
+//					osDelay(200);
+//				}
+//			}
+			retval_client = getsockopt(APP_SOCK, SO_STATUS, &sock_status_client);
+			while (sock_status_client == SOCK_ESTABLISHED)
       {
         // Do nothing
         osSignalWait(0x01, osWaitForever);
         retval_client = getsockopt(APP_SOCK, SO_STATUS, &sock_status_client);
       }
-      printf("Disconnected! ");
-    }
-    else // Something went wrong
-    {
-      printf("Failed! \r\n");
-    }
-    // Close the socket and start a connection again
-    close(APP_SOCK);
-    printf("Socket closed.\r\n");
-  }
-  else // Can't open the socket. This may mean something is wrong with W5500 configuration
-  {
-    printf("Failed to open socket!\r\n");
-  }
-  // Wait 500 msec before opening
-  osDelay(500);
+			 printf("Disconnected! ");
+		}
+		else // Something went wrong
+		{
+			 printf("Failed! \r\n");
+		}
+		// Close the socket and start a connection again
+		close(APP_SOCK);
+		 printf("Socket closed.\r\n");
+	}
+	else // Can't open the socket. This may mean something is wrong with W5500 configuration
+	{
+		 printf("Failed to open socket!\r\n");
+	}
+	// Wait 500 msec before opening
+	osDelay(500);
 }
