@@ -61,23 +61,31 @@ void thread_process(void const *argument)
     // If the client has connected, print the message
     if (sock_status_server == SOCK_ESTABLISHED)
     {
-      retval_server = recv(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity));
-      printf("Received velocity: %d\r\n", velocity);
+      if((retval_server = recv(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity)))==sizeof(velocity));
+      {
+				printf("Received velocity: %d\r\n", velocity);
 
-      // Get system clock
-      millisec = Main_GetTickMillisec();
+				// Get system clock
+				millisec = Main_GetTickMillisec();
 
-      // Calculate control signal
-      control = Controller_PIController(reference, velocity, millisec);
+				// Calculate control signal
+				control = Controller_PIController(reference, velocity, millisec);
 
-      // Send the control signal
-      retval_server = send(APP_SOCK, (uint8_t *)&control, sizeof(control));
-      printf("Sent control: %d\r\n", control);
+				// Send the control signal
+				if((retval_server = send(APP_SOCK, (uint8_t *)&control, sizeof(control)))==sizeof(control));
+				{
+					printf("Sent control: %d\r\n", control);
+					osSignalSet(main_ID,0x01);
+				}
+			}
+			else
+				printf("Failed receiving velocity! \r\n");
+				osSignalSet(main_ID, 0x01);
     }
     else
     {
-      printf("Failed receiving velocity! \r\n");
-          osSignalSet(main_ID, 0x01);
+			printf("Failed establish! \r\n");
+			osSignalSet(main_ID, 0x01);
     }
   }
 }
@@ -148,7 +156,8 @@ void Application_Loop()
 				else
 				{
 					printf("sock_status: %d\r\n",sock_status_server);
-					osDelay(100);}
+					osDelay(100);
+				}
 				retval_server = getsockopt(APP_SOCK, SO_STATUS, &sock_status_server);
 			}
 			 printf("Disconnected! ");

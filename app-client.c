@@ -70,7 +70,7 @@ void thread_getspeed(void const *argument)
       // Stop the motor
       Peripheral_PWM_ActuateMotor(0);
       printf("Disconnected! Motor stopped! ");
-//		osSignalSet(main_ID, 0x01);
+			osSignalSet(main_ID, 0x01);
     }
   }
 }
@@ -81,8 +81,9 @@ void thread_PWM(void const *argument)
   {
     osSignalWait(0x04, osWaitForever);
     // Apply control signal to motor
+		printf("Acuate control: %d\r\n",control);
     Peripheral_PWM_ActuateMotor(control);
-//		osSignalSet(main_ID, 0x01);
+		osSignalSet(main_ID, 0x01);
   }
 }
 
