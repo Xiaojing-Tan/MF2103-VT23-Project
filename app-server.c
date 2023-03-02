@@ -80,16 +80,19 @@ void thread_process(void const *argument)
 				else
 				{
 					printf("Fail to send control signal!!! \r\n");
+					Controller_Reset();
 					osSignalSet(main_ID,0x01);
 				}
 			}
 			else
 				printf("Failed to receove velocity!!! \r\n");
+				Controller_Reset();
 				osSignalSet(main_ID, 0x01);
     }
     else
     {
 			printf("Failed establish! \r\n");
+			Controller_Reset();
 			osSignalSet(main_ID, 0x01);
     }
   }
