@@ -93,13 +93,24 @@ void thread_communicate(void const *argument)
   {
     osSignalWait(0x03, osWaitForever);
     // Send the velocity
-    retval_client = send(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity));
-    printf("Sent velocity: %d\r\n", velocity);
-
+    if((retval_client = send(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity)))==sizeof(velocity))
+    {printf("Sent velocity: %d. Waiting for control signal... \r\n", velocity);}
+		else
+			{
+				printf("Failed to send velocity!!! \r\n");
+				osSignalSet(main_ID,0x01);
+			}
     // Actuate PWM unitl receive control signal
-    retval_client = recv(APP_SOCK, (uint8_t *)&control, sizeof(control));
-    printf("Received control: %d\r\n", control);
-    osSignalSet(PWM_ID, 0x04);
+    if((retval_client = recv(APP_SOCK, (uint8_t *)&control, sizeof(control)))==sizeof(control))
+    {
+			printf("Received control: %d\r\n", control);
+			osSignalSet(PWM_ID, 0x04);
+		}
+		else
+		{
+			printf("Failed to receive control!!! \r\n");
+			osSignalSet(main_ID,0x01);
+		}
   }
 }
 

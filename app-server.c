@@ -33,7 +33,7 @@ void callback(void const *param);
 
 /* Define threads */
 osThreadId toggle_ID, process_ID, main_ID;
-osThreadDef(thread_toggle, osPriorityAboveNormal, 1, 0);
+osThreadDef(thread_toggle, osPriorityHigh, 1, 0);
 osThreadDef(thread_process, osPriorityNormal, 1, 0);
 
 /* Define Timer */
@@ -57,11 +57,11 @@ void thread_process(void const *argument)
 {
   for (;;)
   {
-    osSignalWait(0x02, osWaitForever);
+    osSignalWait(0x03, osWaitForever);
     // If the client has connected, print the message
     if (sock_status_server == SOCK_ESTABLISHED)
     {
-      if((retval_server = recv(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity)))==sizeof(velocity));
+      if((retval_server = recv(APP_SOCK, (uint8_t *)&velocity, sizeof(velocity)))==sizeof(velocity))
       {
 				printf("Received velocity: %d\r\n", velocity);
 
@@ -72,14 +72,19 @@ void thread_process(void const *argument)
 				control = Controller_PIController(reference, velocity, millisec);
 
 				// Send the control signal
-				if((retval_server = send(APP_SOCK, (uint8_t *)&control, sizeof(control)))==sizeof(control));
+				if((retval_server = send(APP_SOCK, (uint8_t *)&control, sizeof(control)))==sizeof(control))
 				{
 					printf("Sent control: %d\r\n", control);
 					osSignalSet(main_ID,0x01);
 				}
+				else
+				{
+					printf("Fail to send control signal!!! \r\n");
+					osSignalSet(main_ID,0x01);
+				}
 			}
 			else
-				printf("Failed receiving velocity! \r\n");
+				printf("Failed to receove velocity!!! \r\n");
 				osSignalSet(main_ID, 0x01);
     }
     else
@@ -140,6 +145,8 @@ void Application_Loop()
 		if ((retval_server = listen(APP_SOCK)) == SOCK_OK)
 		{
 			 printf("Success!\r\n");
+      // Start timer here
+      osTimerStart(timer_toggle, PERIOD_REF);
 			retval_server = getsockopt(APP_SOCK, SO_STATUS, &sock_status_server);
 			while (sock_status_server == SOCK_LISTEN || sock_status_server == SOCK_ESTABLISHED)
 			{
@@ -148,7 +155,7 @@ void Application_Loop()
 				{
 //					retval_server = recv(APP_SOCK, (uint8_t *)&msg_server, sizeof(msg_server));
 //					 printf("Received: %d\r\n", msg_server);
-					osSignalSet(process_ID, 0x02);
+					osSignalSet(process_ID, 0x03);
           // Do nothing
           osSignalWait(0x01, osWaitForever);
 				}
