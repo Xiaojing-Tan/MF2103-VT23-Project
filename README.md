@@ -97,17 +97,17 @@ Note that STM32CubeMX needs a Java run-time environment (JRE). So, if you don’
 Refer to instructions form Tutorial 1 if necessary!
 
 1. First, create a new project in the Keil MDK (Microcontroller Development Kit).
-    - Keep in mind: you should not need to create multiple copies of this project, and you will not need to make a new project for the different tasks. Development will be incremental, and you will learn techniques for handling code variants within the same project structure. Name your project accordingly—don’t call it Task0…
+    - Keep in mind: you should not need to create multiple copies of this project, and you will not need to make a new project for the different tasks. Development will be incremental, and you will learn techniques for handling code variants within the same project structure. Name your project accordingly—don’t call it Task0...
     - If you are interested in versioning while developing code, you should consider Git. KTH provides all students with GitHub Enterprise for free!
 2. When prompted for the Device for Target, select STM32L476RG.
 3. When prompted to “Manage Run-Time Environment”, choose the following software components that you want included in your new project:
-    - Compiler → I/O
-        - STDOUT ✔, Variant: ITM
-    - Device → Startup: ✔
-    - Device → STM32Cube HAL
-        - GPIO: ✔
-        - SPI: ✔
-        - TIM: ✔
+    - Compiler &rarr; I/O
+        - STDOUT &#10004;, Variant: ITM
+    - Device &rarr; Startup: &#10004;
+    - Device &rarr; STM32Cube HAL
+        - GPIO: &#10004;
+        - SPI: &#10004;
+        - TIM: &#10004;
 4. You will notice that some of the selections are orange in color. This means that the selections require additional components. Click Resolve, to automatically fill in the missing dependencies.
 5. Click OK.
 6. Having identified that the selected device can be supported by STM32CubeMX, Keil MDK will prompt you to launch the STM32CubeMX application. Do it now. (If you get prompted for a missing Java JRE, see instructions in section 7.1)
@@ -131,30 +131,30 @@ Under the Pinout & Configuration page, in the leftmost panel (under Categories),
 System Core
 1. RCC (Reset and Clock Controller)
     - Mode
-        - High Speed Clock (HSE) → Crystal/Ceramic Resonator
-        - Low Speed Clock (LSE) → Disable
+        - High Speed Clock (HSE) &rarr; Crystal/Ceramic Resonator
+        - Low Speed Clock (LSE) &rarr; Disable
 2. SYS (System)
     - Mode
-        - Debug → Trace Asynchronous Sw
+        - Debug &rarr; Trace Asynchronous Sw
 
 Timers
 1. TIM1 (Advanced-control timer)
     - Mode
-        - Combined Channels → Encoder Mode
+        - Combined Channels &rarr; Encoder Mode
     - Configuration [Parameter Settings]
-        - Prescaler (PSC) → 0
-        - Counter Period (ARR) → 65535 (or 0xFFFF in hexadecimal)
-        - Encoder Mode → Encoder Mode TI1 and TI2
+        - Prescaler (PSC) &rarr; 0
+        - Counter Period (ARR) &rarr; 65535 (or 0xFFFF in hexadecimal)
+        - Encoder Mode &rarr; Encoder Mode TI1 and TI2
             > Think about the period of the encoder counter timer. Why is it set to 0xFFFF? Keep this in mind for when you will initialise the timers.
 
 2. TIM3 (General-purpose timer)
     - Mode
-        - Channel 1 → PWM Generation CH1
-        - Channel 2 → PWM Generation CH2
+        - Channel 1 &rarr; PWM Generation CH1
+        - Channel 2 &rarr; PWM Generation CH2
      - Configuration [Parameter Settings]
-        - Prescaler (PSC) → 0
-        - Counter Period (ARR) → 2047 (decimal)
-        - Mode → PWM mode 1
+        - Prescaler (PSC) &rarr; 0
+        - Counter Period (ARR) &rarr; 2047 (decimal)
+        - Mode &rarr; PWM mode 1
             > Think about the period of the PWM timer. Why is it set to 2047? What is the resulting PWM frequency?
 
 Next, you will configure the functionality of some of the pins. Recall that a given pin can be used for general purpose I/O, as well as several alternate functions, which are determined by the hardware. By selecting the pin function here, all other functions are disabled. In the Pinout view, set the pin functionality according to the following table: (Note that in some cases, the pin might already be set to as desired)
@@ -193,31 +193,31 @@ Note: It may warn that the project generation encountered a problem, but the cod
 ### Configure Compiler Options
 Now, you will set some of the compiler settings for the Project—you will use settings which have been chosen to achieve a balance between code size, debug view, and compilation-time feedback. If interested, you can read more about it here.
 
-Back in Keil MDK, select the magic wand to open Options for Target… window.
+Back in Keil MDK, select the magic wand to open Options for Target... window.
 
 1. Under the Target tab, in the Code Generation section
     - ARM Compiler: Use default compiler version 5
-    - Use MicroLIB: ✔
+    - Use MicroLIB: &#10004;
 2. Under the C/C++ tab
     - Optimization: Level 0 (-O0)
-    - One ELF Section per Function: ✔
+    - One ELF Section per Function: &#10004;
     - Warning: All Warnings
-    - C99 Mode: ✔
+    - C99 Mode: &#10004;
     - Misc Controls: `--diag_error=223`
 
 ### Configure Debugger Options
 1. Under the Debug tab, choose ST-Link Debugger, then click Settings.
 2. In the new window that appear, select the Trace tab
     - Set the Core Clock to 40 MHz
-    - Trace Enable: ✔
+    - Trace Enable: &#10004;
     - Untick EXCTRC: Exception tracing under Trace Events
     - Untick all ITM Stimulus ports except Port 31 and 0.
         > Check Tutorial 1: "ST-Link/V2 and Keil", section 19 again. What features are you actually interested in enabling?
 3. Select the Flash Download tab
     - Select Erase Full Chip
-    - Program: ✔
-    - Verify: ✔
-    - Reset and Run: ✔
+    - Program: &#10004;
+    - Verify: &#10004;
+    - Reset and Run: &#10004;
 4. Select OK twice, to close all dialog windows.
 
 ### Add Skeleton C- & H-files to the project
@@ -229,16 +229,16 @@ As promised, in this project, you are to be given a skeleton code that you are e
     - Download, unzip and save the folders Source and Include from the course material to the base directory of your Keil project. (That is, the folder where the *.uvprojx file exists. and not for example the MDK-ARM folder).
 2. Import C-files into your project in Keil MDK
     - Go to Keil MDK.
-    - Inside the Project window on the left, right-click Target 1 and choose Manage Project Items…
-    - Click Add Files… and add the following files to the empty “Source Group 1”.
+    - Inside the Project window on the left, right-click Target 1 and choose Manage Project Items...
+    - Click Add Files... and add the following files to the empty “Source Group 1”.
     - source/peripherals.c
     - source/controller.c
     - source/application.c
     - You have now made these C-files part of the project, which means they will be compiled and linked when you build the project.
 3. Next, we need to include the folder that contains header h-files in the “include path”.
     - Right-click Target 1 and select Options for Target ‘Target1’.
-    - Under C/C++, click the “…” next to Include Paths,
-    - In the new window that appears, click the “new” button, and then the “…” that appears.
+    - Under C/C++, click the “...” next to Include Paths,
+    - In the new window that appears, click the “new” button, and then the “...” that appears.
     - In the File Dialog that appears, select the Include folder containing the header files.
     - select OK to close all dialogs.
 
@@ -342,13 +342,13 @@ Build the project and run it in debug mode.
 
 The Watch Window
 1. In the Project window, navigate to the file application.c and open it.
-2. Right click the variable `millisec` and choose Add millisec to… → Watch 1. The Watch 1 window should appear next to the command window. If it doesn’t, you can bring it out under View → Watch Windows.
+2. Right click the variable `millisec` and choose Add millisec to... &rarr; Watch 1. The Watch 1 window should appear next to the command window. If it doesn’t, you can bring it out under View &rarr; Watch Windows.
 3. Do the same thing for the variables reference, velocity, and control.
 
 As you’d expect from the code you have written so far, you should notice that the variables `reference` and `millisec` change over time. `velocity` and `control` remain at 0.
 
 The Logic Analyzer
-1. Right click the variable velocity and choose Add to… → Logic Analyzer.
+1. Right click the variable velocity and choose Add to... &rarr; Logic Analyzer.
 2. Right click the y-axis and enable Adaptive Min/Max.
 3. The Logic Analyzer allows you graphically monitor continuous signals over time.
 
@@ -415,13 +415,13 @@ Additionally, when performing mathematics in C, keep in mind which datatypes you
 ### Continuous operation
 The purpose of `Controller_PIController` is normally to be called continuously over long periods of time. However, there may be cases where the application would disable the motor and suspend control. When control is resumed, it is undesired for the controller to retain old values for the internal states. For this reason, `Controller_Reset` can be called by the application in between.
 
-If you have implemented the controller already, you will likely also have noticed that during the first pulse of the reference, your motor overshoots—this is a related issue. Depending on your implementation, the first segment of the integral is calculated from the time when the microprocessor is powered on, until the first time the controller is called! This could be potentially catastrophic…
+If you have implemented the controller already, you will likely also have noticed that during the first pulse of the reference, your motor overshoots—this is a related issue. Depending on your implementation, the first segment of the integral is calculated from the time when the microprocessor is powered on, until the first time the controller is called! This could be potentially catastrophic...
 
 One way to address this is to inhibit the controller during the first call in a sequence of control actions. For this call, the controller can return zero. You can assume that the application would call `Controller_Reset` once before the start of every such sequence.
 
 Your final goal is to improve your code and implement the function `Controller_Reset` such that the desired performance is achieved.
 
-### To be approved on this task …
+### To be approved on this task ...
 Each student in the group should be able to explain how the code works.
 
 You also need to be able to drive the motor in both directions, by using the two PWM signals with duty cycles between 0 to 100 percent:
@@ -475,14 +475,14 @@ You first need to add Keil RTX (The CMSIS-RTOS implementation) to your project.
 
 1. Add Keil RTX component to your project
    - Select “Manage Run-Time Environment”
-   - Select the following software component CMSIS → RTOS (API) → Keil RTX: ✔
+   - Select the following software component CMSIS &rarr; RTOS (API) &rarr; Keil RTX: &#10004;
 2. If you try to Build the project now, you will notice that several interrupt handlers are defined multiple times, including the SysTick_Handler. This will naturally cause problems.
 3. To remedy, you need to prevent a conflict in how SysTick is incremented, given that you have the STM32Cube hardware abstraction layer enabled as well.
 4. Select “Manage Run-Time Environment” again
-5. Under “Device → STM32Cube Framework (API) → STM32CubeMX”, select the Play button to start the STM32CubeMX application.
+5. Under “Device &rarr; STM32Cube Framework (API) &rarr; STM32CubeMX”, select the Play button to start the STM32CubeMX application.
 6. Find System Core under Categories, then NVIC (Nested Vector Interrupt Controller)
    - In the middle window “NVIC Mode and Configuration”, open the tab NVIC
-   - Priority Group → 4 bits for pre-emption ...
+   - Priority Group &rarr; 4 bits for pre-emption ...
    - Under the NVIC Interrupt Table, set the following pre-emption priorities;
    - System service call via SWI instruction: 14
    - Pendable request for system service: 15
@@ -537,7 +537,7 @@ Your task now is to break up the code in the infinite loop into two separate thr
 
 1. Sample the encoder, calculate the control signal, and apply it
 2. Toggle the direction of the reference
-> Which thread should be assigned with a higher priority? The answer might be a little counterintuitive at first… Why?
+> Which thread should be assigned with a higher priority? The answer might be a little counterintuitive at first... Why?
 
 The “main” thread will be defined by the Application Loop, which is empty for this task.
 
@@ -580,18 +580,18 @@ All the necessary code to configure your microcontroller and initialise communic
 First, you should enable the WIZnet Ethernet Shield. It has its own microprocessor, buffer, and connectivity capacity. The SPI protocol will be used to connect the microcontroller to the shield. To do this, you should now enable the SPI3 peripheral, and slave-selector pin in STM32CubeMX.
 
 1. Select “Manage Run-Time Environment”.
-1. Under “Device → STM32Cube Framework (API) → STM32CubeMX”, select the Play button to start the STM32CubeMX application.
+1. Under “Device &rarr; STM32Cube Framework (API) &rarr; STM32CubeMX”, select the Play button to start the STM32CubeMX application.
 1. Select the “Pinout & Configuration” page
 1. In the Pinout view, set the pin functionality of PB6 to be GPIO_Output.
 1. Find System Core under Categories, then GPIO (General Purpose I/O)
     - In the middle window “NVIC Mode and Configuration”, open the tab GPIO
-        - PB6: GPIO Pull-up/Pull-down → Pull-up
+        - PB6: GPIO Pull-up/Pull-down &rarr; Pull-up
 1. Find Connectivity under Categories, then SPI3 (Serial Peripheral Interface)
     - In the Mode window
-        - Mode → Full-Duplex Master
-        - Hardware NSS Signal → Disable
+        - Mode &rarr; Full-Duplex Master
+        - Hardware NSS Signal &rarr; Disable
     - Under Configuration
-        - Data Size → 8 Bits
+        - Data Size &rarr; 8 Bits
 1. Under the pinout view, double check-that the following pins have appeared:
     - PC12: SPI3_MOSI
     - PC11: SPI3_MISO
@@ -613,7 +613,7 @@ You will now include a driver (ioLibrary) that implements the Socket API, upon w
 
 1. Download the Wiznet’s GitHub repository
     - Go to https://github.com/Wiznet/ioLibrary_Driver
-    - Select Code → Download ZIP
+    - Select Code &rarr; Download ZIP
     - Unzip the downloaded zip file to the base directory of your Keil project.
 2. In Keil MDK, import the following C-files into your project. It is good practice to add them to a new “Source Group”, that can—for example—be called Ethernet.
     - Ethernet/socket.c
@@ -638,7 +638,7 @@ Now that you have laid the groundwork, let’s create two new targets for the se
     - app-client.c
     - app-server.c
 2. Create new Client and Server Targets
-    - In Keil MDK, right-click on your target and select Manage Project Items…
+    - In Keil MDK, right-click on your target and select Manage Project Items...
     - In the same Group that contains the application.c file, add the two newly created files.
     - Under Project Targets, add two new targets, named “Client” and “Server”.
     - press OK.
@@ -674,7 +674,7 @@ Note: An alternative to creating two targets would be to create two new MDK proj
 In section 10.3, you created two targets, and configured each to include/exclude specific files. But what if you want to use the same file in both targets, with only small changes in the logic for each target? There are scenarios where you would want to include/exclude small pieces of code within the same file, while keeping most code in common. For this, conditional compilation can be useful. You will see how this is used in the section that follows. For now, let’s define some terms that differentiate the two targets.
 
 1. Select the Client target.
-1. Open Options for Target…
+1. Open Options for Target...
 1. Select C/C++
 1. Under Preprocessor Symbols, enter the following two terms under Define:
     - `_ETHERNET_ENABLED _CLIENT_CONFIG`
@@ -818,7 +818,7 @@ In main.c, add the following pieces of code within the appropriate user block. D
 The Ethernet driver is configured and initialized. You can now make TCP/IP socket function calls directly, without any need for any additional setup of the lower layers.
 
 ### Conditional compilation - Explained
-In the code of the previous section, hopefully you have noticed the code `#ifdef … #endif`. What does this mean? This is a directive to the Preprocessor (a step before the compiler compiles the code in the file) to include the C-code inside the `#ifdef … #endif` block, if the term (for example `_SERVER_CONFIG`) is defined. Otherwise, the complier won’t even see this C-code block. The effect of using this directive is to make the same file contain different C-code for the compiler, depending on target settings.
+In the code of the previous section, hopefully you have noticed the code `#ifdef ... #endif`. What does this mean? This is a directive to the Preprocessor (a step before the compiler compiles the code in the file) to include the C-code inside the `#ifdef ... #endif` block, if the term (for example `_SERVER_CONFIG`) is defined. Otherwise, the complier won’t even see this C-code block. The effect of using this directive is to make the same file contain different C-code for the compiler, depending on target settings.
 
 And where did `_SERVER_CONFIG` come from? See section 10.5, and hopefully you can connect the dots yourself.
 
@@ -874,7 +874,7 @@ Previously, the application has been configured to run all the setup once, and t
 
 Of course, you should not be trying to transmit or receive anything when there is not an established connection! Similarly, the start of every session (the instant connection is established) should also serve as t=0 for the reference generator.
 
-> Think about how you should handle that using the OS, and which additional functions you defined in Task 1 that you should be calling here…
+> Think about how you should handle that using the OS, and which additional functions you defined in Task 1 that you should be calling here...
 
 Some tips:
 
@@ -885,7 +885,7 @@ Some functions, such as the function for receiving, are by default blocking, so 
     - If you get stuck while receiving, calling `disconnect` in another thread will cause you to break out of the function when you return to it.
 - Unplugging the ethernet cable will not immediately end the TCP connection! There is a difference between the physical connection, and logical connection. It may take the ethernet shield several seconds (or even minutes) to timeout and close the socket—you will not be able to rely on polling the socket status to determine a loss of connectivity!
 
-### To be approved on this task…
+### To be approved on this task...
 Each student in a group should be able to explain how the code works. You also need to:
 
 1. Draw a simple timing diagram to explain how the control loop sends information between threads and MCUs. Look at \[Wolf-CasC, p. 317] for an example. Use the Event Viewer to help you! Clearly indicate the variables being updated/transmitted.
