@@ -163,7 +163,7 @@ Table 1. Pin Configuration
 
 |Pin	|Selection|
 |---|---|
-|PB4	|IM3_CH1|
+|PB4	|TIM3_CH1|
 |PB3	|SYS_JTDO-SWO|
 |PA14	|SYS_JTCK-SWCLK|
 |PA13	|SYS_JTMS-SWDIO|
